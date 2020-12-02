@@ -25,13 +25,12 @@
 
         import { Matrix4 } from "https://threejs.org/build/three.module.js";
 
-        const degToRadCoef = Math.PI / 180; // Degree-to-Radian conversion
+        const degToRadCoef = Math.PI / 180;
 
         function getRotationMatrix(a, b, g) {
-
-            let _x = b ? b * degToRadCoef : 0; // b value
-            let _y = g ? g * degToRadCoef : 0; // g value
-            let _z = a ? a * degToRadCoef : 0; // a value
+            let _x = b ? b * degToRadCoef : 0; 
+            let _y = g ? g * degToRadCoef : 0; 
+            let _z = a ? a * degToRadCoef : 0;
 
             let cX = Math.cos(_x);
             let cY = Math.cos(_y);
@@ -58,7 +57,6 @@
                 m31, m32, m33, 0,
                 0, 0, 0, 1,
             ];
-
         }
 
         function getKleinBottleGeometry(u, v, targetVector) {
@@ -85,26 +83,19 @@
         }
 
         let scene = new THREE.Scene();
-
-        let camera = new THREE.PerspectiveCamera(1500, window.innerWidth / window.innerHeight, 0.1, 10000);
-
         let renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        // for manual rotation of the surface
+        let camera = new THREE.PerspectiveCamera(1500, window.innerWidth / window.innerHeight, 0.1, 10000);
         let controls = new DeviceOrientationControls(camera, renderer.domElement);
 
-        // for adaptive resize of the window in the browser
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
         window.addEventListener('resize', () => {
             renderer.setSize(window.innerWidth, window.innerHeight);
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
-        })
+        });
 
-        //  ParametricGeometry - a function that takes in a u and v value each between 0 and 1 and modifies a third Vector3
-        //  argument
-        let geometry = new THREE.ParametricGeometry(getKleinBottleGeometry, 50, 50);
+        let kleinBottleGeometry = new THREE.ParametricGeometry(getKleinBottleGeometry, 50, 50);
         let nonWireframeMaterial = new THREE.MeshBasicMaterial({
             color: 0x38761d,
             side: THREE.DoubleSide,
@@ -112,7 +103,7 @@
         });
 
         let rotationSurface = new Object3D();
-        let firstLayerMesh = new THREE.Mesh(geometry, nonWireframeMaterial); // first layer of the surface for 'metal' look
+        let firstLayerMesh = new THREE.Mesh(kleinBottleGeometry, nonWireframeMaterial);
 
         let matrix = new Matrix4().setPosition(getRotationMatrix(0.5, 0.5, 0.5));
         firstLayerMesh.setRotationFromMatrix(matrix);
@@ -120,14 +111,12 @@
         rotationSurface.add(firstLayerMesh);
         scene.add(rotationSurface);
 
-        // second geometry and material arguments for creating a wireframe layer
-        let geometry2 = new THREE.ParametricGeometry(getKleinBottleGeometry, 50, 50);
         let wireframeMaterial = new THREE.MeshBasicMaterial({
             color: 0x440000,
             side: THREE.DoubleSide,
             wireframe: true,
         });
-        let secondLayerMesh = new THREE.Mesh(geometry2, wireframeMaterial);
+        let secondLayerMesh = new THREE.Mesh(kleinBottleGeometry, wireframeMaterial);
         secondLayerMesh.setRotationFromMatrix(matrix);
 
         rotationSurface.add(secondLayerMesh);
