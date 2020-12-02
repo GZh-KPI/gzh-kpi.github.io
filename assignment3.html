@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Fundamentals of Augmented Reality: Practical assignment #3 (Tangible interface)</title>
+    <style>
+        body {
+          margin: 0;
+        }
+    
+        canvas {
+          width: 100%;
+          height: 100%
+        }
+      </style>
+</head>
+
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.js"></script>
+    <script type="module">
+        import { OrbitControls } from "https://threejs.org/examples/jsm/controls/OrbitControls.js";
+        import { Object3D } from "https://threejs.org/build/three.module.js"
+        import { DeviceOrientationControls } from 'https://threejs.org/examples/jsm/controls/DeviceOrientationControls.js';
+
+        import { Matrix4 } from "https://threejs.org/build/three.module.js";
+
+        const degToRadCoef = Math.PI / 180; // Degree-to-Radian conversion
+
+        function getRotationMatrix(a, b, g) {
+
+            let _x = b ? b * degToRadCoef : 0; // b value
+            let _y = g ? g * degToRadCoef : 0; // g value
+            let _z = a ? a * degToRadCoef : 0; // a value
+
+            let cX = Math.cos(_x);
+            let cY = Math.cos(_y);
+            let cZ = Math.cos(_z);
+            let sX = Math.sin(_x);
+            let sY = Math.sin(_y);
+            let sZ = Math.sin(_z);
+
+            let m11 = cZ * cY - sZ * sX * sY;
+            let m12 = - cX * sZ;
+            let m13 = cY * sZ * sX + cZ * sY;
+
+            let m21 = cY * sZ + cZ * sX * sY;
+            let m22 = cZ * cX;
+            let m23 = sZ * sY - cZ * cY * sX;
+
+            let m31 = - cX * sY;
+            let m32 = sX;
+            let m33 = cX * cY;
+
+            return [
+                m11, m12, m13, 0,
+                m21, m22, m23, 0,
+                m31, m32, m33, 0,
+                0, 0, 0, 1,
+            ];
+
+        }
+
+        function getKleinBottleGeometry(u, v, targetVector) {
+            u *= Math.PI;
+            v *= 2 * Math.PI;
+            u = u * 2;
+            if (u < Math.PI) {
+                targetVector.x = 3 * Math.cos(u) * (1 + Math.sin(u)) + (2 * (1 - Math.cos(u) / 2)) * Math.cos(u) * Math.cos(v);
+                targetVector.z = -8 * Math.sin(u) - 2 * (1 - Math.cos(u) / 2) * Math.sin(u) * Math.cos(v);
+            } else {
+                targetVector.x = 3 * Math.cos(u) * (1 + Math.sin(u)) + (2 * (1 - Math.cos(u) / 2)) * Math.cos(v + Math.PI);
+                targetVector.z = -8 * Math.sin(u);
+            }
+            targetVector.y = -2 * (1 - Math.cos(u) / 2) * Math.sin(v);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+            controls.update();
+
+            rotationSurface.rotation.copy(camera.rotation);
+            camera.lookAt(rotationSurface.position)
+        }
+
+        let scene = new THREE.Scene();
+
+        let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        let renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // for manual rotation of the surface
+        let controls = new DeviceOrientationControls(camera, renderer.domElement);
+
+        // for adaptive resize of the window in the browser
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        })
+
+        //  ParametricGeometry - a function that takes in a u and v value each between 0 and 1 and modifies a third Vector3
+        //  argument
+        let geometry = new THREE.ParametricGeometry(getKleinBottleGeometry, 50, 50);
+        let nonWireframeMaterial = new THREE.MeshBasicMaterial({
+            color: 0x0000ff,
+            side: THREE.DoubleSide,
+            wireframe: false
+        });
+
+        let rotationSurface = new Object3D();
+        let firstLayerMesh = new THREE.Mesh(geometry, nonWireframeMaterial); // first layer of the surface for 'metal' look
+
+        let matrix = new Matrix4().setPosition(getRotationMatrix(0.5, 0.5, 0.5));
+        firstLayerMesh.setRotationFromMatrix(matrix);
+
+        rotationSurface.add(firstLayerMesh);
+        scene.add(rotationSurface);
+
+        // second geometry and material arguments for creating a wireframe layer
+        let geometry2 = new THREE.ParametricGeometry(getKleinBottleGeometry, 50, 50);
+        let wireframeMaterial = new THREE.MeshBasicMaterial({
+            color: 0x440000,
+            side: THREE.DoubleSide,
+            wireframe: true,
+        });
+        let secondLayerMesh = new THREE.Mesh(geometry2, wireframeMaterial);
+        secondLayerMesh.setRotationFromMatrix(matrix);
+
+        rotationSurface.add(secondLayerMesh);
+        scene.add(rotationSurface);
+
+        camera.position.z = 4;
+
+        controls.update();
+
+        animate();
+    </script>
+
+</body>
+
+</html>
