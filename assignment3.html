@@ -6,14 +6,14 @@
     <title>Fundamentals of Augmented Reality: Practical assignment #3 (Tangible interface)</title>
     <style>
         body {
-          margin: 0;
+            margin: 0;
         }
-    
+
         canvas {
-          width: 100%;
-          height: 100%
+            width: 100%;
+            height: 100%
         }
-      </style>
+    </style>
 </head>
 
 <body>
@@ -86,7 +86,7 @@
 
         let scene = new THREE.Scene();
 
-        let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        let camera = new THREE.PerspectiveCamera(1500, window.innerWidth / window.innerHeight, 0.1, 10000);
 
         let renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -106,7 +106,7 @@
         //  argument
         let geometry = new THREE.ParametricGeometry(getKleinBottleGeometry, 50, 50);
         let nonWireframeMaterial = new THREE.MeshBasicMaterial({
-            color: 0x0000ff,
+            color: 0x38761d,
             side: THREE.DoubleSide,
             wireframe: false
         });
@@ -133,7 +133,10 @@
         rotationSurface.add(secondLayerMesh);
         scene.add(rotationSurface);
 
-        camera.position.z = 4;
+        camera.position.x = -10;
+        camera.position.y = 10;
+        camera.position.z = 20;
+        camera.lookAt(new THREE.Vector3(10, -20, 0));
 
         controls.update();
 
