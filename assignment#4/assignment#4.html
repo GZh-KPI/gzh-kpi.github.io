@@ -35,6 +35,10 @@
 	// Create a camera
 	var camera = new THREE.Camera();
 	scene.add(camera);
+	camera.position.x = -10;
+        camera.position.y = 10;
+        camera.position.z = 20;
+        camera.lookAt(new THREE.Vector3(10, -20, 0));
 
 	////////////////////////////////////////////////////////////////////////////////
 	//          handle arToolkitSource
@@ -148,7 +152,6 @@
             opacity: 0.9
         })
     );
-    kleinBottleMesh.position.y = 0.5
     arWorldRoot.add(kleinBottleMesh);
 	onRenderFcts.push(function(){
 		mesh.rotation.x += 0.1
