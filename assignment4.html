@@ -137,7 +137,7 @@
 	kleinBottle.position.y	= geometry.parameters.height/2;
 	arWorldRoot.add( kleinBottle );
 
-	var geometry	= new THREE.ParametricGeometry(createkleinBottle, 50, 50);
+	var geometry	= new THREE.ParametricGeometry(getKleinBottleGeometry, 50, 50);
 	var material	= new THREE.MeshBasicMaterial( {
         color: 0x440000,
         side: THREE.DoubleSide,
