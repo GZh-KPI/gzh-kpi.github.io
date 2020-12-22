@@ -144,6 +144,9 @@
         wireframe: true,
     } );
 	var kleinBottle	= new THREE.Mesh( geometry, material );
+	kleinBottle.scale.x = 0.5; // SCALE
+	kleinBottle.scale.y = 0.5; // SCALE
+	kleinBottle.scale.z = 0.5; // SCALE
 	kleinBottle.position.y	= 0.5;
 	arWorldRoot.add( kleinBottle );
 
