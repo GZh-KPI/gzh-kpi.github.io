@@ -2,6 +2,7 @@
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 <script src='lib/three.min.js'></script>
 <script src="lib/ar.js"></script>
+<!--<script>THREEx.ArToolkitContext.baseURL = ''</script>-->
 
 <body style='margin : 0; overflow: hidden; font-family: Monospace;'>
 
@@ -129,19 +130,19 @@
 
     var arWorldRoot = smoothedRoot
 
-    var cnot = function(u, v, targetVector) {
-            u *= Math.PI;
-            v *= 2 * Math.PI;
-            u = u * 2;
-            if (u < Math.PI) {
-                targetVector.x = 3 * Math.cos(u) * (1 + Math.sin(u)) + (2 * (1 - Math.cos(u) / 2)) * Math.cos(u) * Math.cos(v);
-                targetVector.z = -8 * Math.sin(u) - 2 * (1 - Math.cos(u) / 2) * Math.sin(u) * Math.cos(v);
-            } else {
-                targetVector.x = 3 * Math.cos(u) * (1 + Math.sin(u)) + (2 * (1 - Math.cos(u) / 2)) * Math.cos(v + Math.PI);
-                targetVector.z = -8 * Math.sin(u);
-            }
-            targetVector.y = -2 * (1 - Math.cos(u) / 2) * Math.sin(v);
-        }
+    var cnot = function(u, v, target){
+        u *= 12 * Math.PI;
+        v *= 2 * Math.PI;
+
+        var R = 2;
+        var a = 0.5;
+
+        var x = (R + a * Math.cos(u/2)) * Math.cos(u/3) + a * Math.cos(u/3) * Math.cos(v - Math.PI);
+        var y = (R + a * Math.cos(u/2)) * Math.sin(u/3) + a * Math.sin(u/3) * Math.cos(v - Math.PI);
+        var z = a + Math.sin(u/2) + a * Math.sin (v - Math.PI);
+
+        target.set(x,y,z);
+    };
 
     /* Create and add the transparent cnot_fig to the scene */
     var cnot_fig = new THREE.Mesh(
@@ -156,6 +157,7 @@
             opacity: 0.9
         } )
     );
+    cnot_fig.position.y = 0.5
     arWorldRoot.add(cnot_fig);
 
     onRenderFcts.push(function () {
